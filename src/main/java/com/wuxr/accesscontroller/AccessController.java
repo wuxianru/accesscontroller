@@ -9,49 +9,27 @@ public class AccessController {
 
     private String controllerType;
 
-    private long intervalInMills;
-
-    public CacheAdapter getCacheAdapter() {
-        return cacheAdapter;
-    }
-
     public void setCacheAdapter(CacheAdapter cacheAdapter) {
         this.cacheAdapter = cacheAdapter;
-    }
-
-    public long getBucketLimit() {
-        return bucketLimit;
     }
 
     public void setBucketLimit(long bucketLimit) {
         this.bucketLimit = bucketLimit;
     }
 
-    public String getControllerType() {
-        return controllerType;
-    }
-
     public void setControllerType(String controllerType) {
         this.controllerType = controllerType;
     }
 
-    public long getIntervalInMills() {
-        return intervalInMills;
+    public long getPermitPerSec() {
+        return permitPerSec;
     }
 
-    public void setIntervalInMills(long intervalInMills) {
-        this.intervalInMills = intervalInMills;
+    public void setPermitPerSec(long permitPerSec) {
+        this.permitPerSec = permitPerSec;
     }
 
-    public long getIntervalPerPermit() {
-        return intervalPerPermit;
-    }
-
-    public void setIntervalPerPermit(long intervalPerPermit) {
-        this.intervalPerPermit = intervalPerPermit;
-    }
-
-    private long intervalPerPermit;
+    private long permitPerSec;
 
 
     public boolean accessControl(String controlKey) {
@@ -62,8 +40,8 @@ public class AccessController {
             synchronized (cacheAdapter) {
                 tb=cacheAdapter.getBucket(controlTypeKey);
                 if (tb == null) {
-                    tb = new TokenBucket(System.currentTimeMillis(),
-                            this.bucketLimit, this.intervalInMills, this.intervalPerPermit);
+                    tb = new TokenBucket(
+                            this.bucketLimit,  this.permitPerSec);
                     cacheAdapter.putBucket(this.controllerType+controlKey,tb);
                     return true;
                 } else {

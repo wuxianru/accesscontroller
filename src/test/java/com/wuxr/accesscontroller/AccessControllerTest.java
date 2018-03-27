@@ -32,10 +32,9 @@ class AccessControllerTest {
 
         ea.setEhcache(cache);
         ac.setBucketLimit(100);
+        ac.setPermitPerSec(10);
         ac.setCacheAdapter(ea);
         ac.setControllerType("IP");
-        ac.setIntervalInMills(10000);
-        ac.setIntervalPerPermit(2000);
 
 
 
@@ -49,6 +48,10 @@ class AccessControllerTest {
         assert(true);
     }
 
+    /**
+     *
+     * @throws InterruptedException
+     */
     @Test
     void accessControl() throws InterruptedException {
         for(int i=0;i<101;i++)
@@ -63,6 +66,7 @@ class AccessControllerTest {
         Thread.sleep(3000);
         assertTrue(ac.accessControl("1"));
     }
+
     @AfterEach
     public void finishe(){
 
