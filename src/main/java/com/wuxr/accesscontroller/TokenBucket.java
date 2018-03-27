@@ -1,6 +1,9 @@
 package com.wuxr.accesscontroller;
 
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  *
  * 令牌桶
@@ -11,6 +14,7 @@ public class TokenBucket {
     private long currentTokensRemaining;
     private long intervalInMills;
     private long permitPerSec;
+    private static final Logger logger = LogManager.getLogger(com.wuxr.accesscontroller.TokenBucket.class);
 
 
     /**
@@ -23,11 +27,15 @@ public class TokenBucket {
         this.currentTokensRemaining=bucketLimit;
         this.permitPerSec=permitPerSec;
         this.intervalInMills=bucketLimit/permitPerSec*1000;
+        logger.trace("bucket initialized");
     }
     public synchronized boolean  getToken(){
 
+        logger.trace("currentTokenReming:"+this.currentTokensRemaining);
+
         long currentTime= System.currentTimeMillis();
         long intervalSinceLast =currentTime - this.lastRefillTime;
+
 
         //根据间隔时间计算令牌数量
         if (intervalSinceLast > this.intervalInMills) {
