@@ -1,7 +1,14 @@
 package com.wuxr.accesscontroller;
 
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+
 public class AccessController {
+
+    private static final Logger logger = LogManager.getLogger(AccessController.class);
+
 
     private CacheAdapter cacheAdapter;
 
@@ -37,11 +44,13 @@ public class AccessController {
         TokenBucket tb = cacheAdapter.getBucket(controlTypeKey);
 
         if (tb == null) {
-            synchronized (cacheAdapter) {
+            synchronized (this) {
+                logger.trace("new to cache");
                 tb=cacheAdapter.getBucket(controlTypeKey);
                 if (tb == null) {
                     tb = new TokenBucket(
                             this.bucketLimit,  this.permitPerSec);
+                    tb.getToken();
                     cacheAdapter.putBucket(this.controllerType+controlKey,tb);
                     return true;
                 } else {
