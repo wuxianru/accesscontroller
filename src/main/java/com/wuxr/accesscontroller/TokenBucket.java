@@ -13,7 +13,7 @@ public class TokenBucket {
     private long bucketLimit;
     private long currentTokensRemaining;
     private long intervalInMills;
-    private long permitPerSec;
+    private long permitPerInterval;
     private static final Logger logger = LogManager.getLogger(com.wuxr.accesscontroller.TokenBucket.class);
 
 
@@ -21,12 +21,12 @@ public class TokenBucket {
      * @param bucketLimit   桶最大容量
      * @param permitPerSec  每秒产生令牌数量
      */
-    public TokenBucket(long bucketLimit,long permitPerSec){
+    public TokenBucket(long bucketLimit,long permitPerInterval,long intervalInMills){
         this.lastRefillTime=System.currentTimeMillis();
         this.bucketLimit= bucketLimit;
         this.currentTokensRemaining=bucketLimit;
-        this.permitPerSec=permitPerSec;
-        this.intervalInMills=bucketLimit/permitPerSec*1000;
+        this.permitPerInterval=permitPerInterval;
+        this.intervalInMills=intervalInMills;
         logger.trace("bucket initialized");
     }
     public synchronized boolean  getToken(){
@@ -42,7 +42,7 @@ public class TokenBucket {
             this.currentTokensRemaining = bucketLimit;
             this.lastRefillTime=currentTime;
         } else {
-            long grantedTokens =  intervalSinceLast * permitPerSec/ 1000;
+            long grantedTokens =  intervalSinceLast * permitPerInterval/ intervalInMills;
             if(grantedTokens>0)
                 this.lastRefillTime=currentTime;
             currentTokensRemaining = Math.min(grantedTokens + this.currentTokensRemaining, bucketLimit);

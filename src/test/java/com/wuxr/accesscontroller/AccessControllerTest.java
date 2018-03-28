@@ -42,7 +42,8 @@ class AccessControllerTest {
 
         ea.setEhcache(cache);
         ac.setBucketLimit(100);
-        ac.setPermitPerSec(1);
+        ac.setPermitPerInterval(1);
+        ac.setInteralInMills(1000);
         ac.setCacheAdapter(ea);
         ac.setControllerType("IP");
 
@@ -58,12 +59,29 @@ class AccessControllerTest {
         assert(true);
     }
 
+    @Test
+    void accessControl() throws InterruptedException {
+        this.ac.setBucketLimit(5);
+        this.ac.setInteralInMills(5000);
+        this.ac.setPermitPerInterval(1);
+        assertTrue(ac.accessControl("1"));
+        assertTrue(ac.accessControl("1"));
+        assertTrue(ac.accessControl("1"));
+        assertTrue(ac.accessControl("1"));
+        assertTrue(ac.accessControl("1"));
+        assertFalse(ac.accessControl("1"));
+        assertFalse(ac.accessControl("1"));
+        Thread.sleep(5000);
+        assertTrue(ac.accessControl("1"));
+
+    }
     /**
      *
+     * 简单测试性能
      * @throws InterruptedException
      */
     @Test
-    void accessControl() throws InterruptedException {
+    void accessControl1() throws InterruptedException {
         for(int j=0;j<2000;j++) {
             final int fj=j;
             for (int i = 0; i < 100; i++)
@@ -72,8 +90,8 @@ class AccessControllerTest {
                     @Override
                     public void run() {
                         long mil=System.currentTimeMillis();
-                        assertTrue(ac.accessControl("ip" + fj));
-                        System.out.println(System.currentTimeMillis()-mil);
+                        assertTrue(ac.accessControl(""+fj));
+                        logger.info("elapsed time:"+(System.currentTimeMillis()-mil));
                     }
                 });
         }

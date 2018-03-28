@@ -28,15 +28,21 @@ public class AccessController {
         this.controllerType = controllerType;
     }
 
-    public long getPermitPerSec() {
-        return permitPerSec;
+    public long getPermitPerInterval() {
+        return permitPerInterval;
     }
 
-    public void setPermitPerSec(long permitPerSec) {
-        this.permitPerSec = permitPerSec;
+    public void setPermitPerInterval(long permitPerSec) {
+        this.permitPerInterval = permitPerSec;
     }
 
-    private long permitPerSec;
+    private long permitPerInterval;
+
+    public void setInteralInMills(long interalInMills) {
+        this.interalInMills = interalInMills;
+    }
+
+    private long interalInMills;
 
 
     public boolean accessControl(String controlKey) {
@@ -49,7 +55,7 @@ public class AccessController {
                 tb=cacheAdapter.getBucket(controlTypeKey);
                 if (tb == null) {
                     tb = new TokenBucket(
-                            this.bucketLimit,  this.permitPerSec);
+                            this.bucketLimit,  this.permitPerInterval,this.interalInMills);
                     tb.getToken();
                     cacheAdapter.putBucket(this.controllerType+controlKey,tb);
                     return true;
